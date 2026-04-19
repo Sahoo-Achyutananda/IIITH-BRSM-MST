@@ -339,7 +339,7 @@ def main(base_data_dir: Optional[Path] = None) -> pd.DataFrame:
 
 if __name__ == "__main__":
     combined_df = main()
-    output_dir = Path(__file__).resolve().parent.parent / "DATA"
+    output_dir = Path(__file__).resolve().parent.parent / "MAIN_DATA" / "MST_Data"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_path = output_dir / "compiled_preprocessed.csv"

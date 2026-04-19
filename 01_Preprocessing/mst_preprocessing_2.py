@@ -270,7 +270,13 @@ def process_condition(condition_folder_path: Path) -> pd.DataFrame:
 def main(base_data_dir: Optional[Path] = None) -> pd.DataFrame:
     """Run preprocessing across all conditions and return the combined dataframe."""
     if base_data_dir is None:
-        base_data_dir = Path(__file__).resolve().parent / "MST_Data"
+        project_root = Path(__file__).resolve().parent.parent
+        candidates = [
+            project_root / "MAIN_DATA" / "MST_DATA",
+            project_root / "MAIN_DATA" / "MST_Data",
+            Path(__file__).resolve().parent / "MST_Data",
+        ]
+        base_data_dir = next((path for path in candidates if path.exists()), candidates[1])
 
     conditions = ["item_only", "Both_item_task", "task_only"]
     frames: List[pd.DataFrame] = []
