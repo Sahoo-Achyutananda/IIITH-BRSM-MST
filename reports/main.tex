@@ -1,0 +1,755 @@
+\documentclass[10pt,a4paper]{article}
+
+% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{parskip}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{microtype}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+
+% ── Colours ───────────────────────────────────────────────────────────────────
+\definecolor{lightgray}{RGB}{245,245,245}
+\definecolor{revblue}{RGB}{220,235,255}
+
+% ── Hyperref ──────────────────────────────────────────────────────────────────
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue,
+  citecolor=black,
+  pdftitle={Testing Memory Under Cognitive Load -- Report 2},
+  pdfauthor={Team Baby Bayes}
+}
+
+% ── Section formatting ────────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries\itshape}{\thesubsection}{0.5em}{}
+\pagestyle{plain}
+
+% ── Verdict helpers ───────────────────────────────────────────────────────────
+\newcommand{\supported}{\textbf{Supported}}
+\newcommand{\notsupported}{\textbf{Not Supported}}
+\newcommand{\partiallysupported}{\textbf{Partially Supported}}
+
+% ── Revision callout box ──────────────────────────────────────────────────────
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{revisionbox}{
+  colback=revblue,
+  colframe=blue!40!black,
+  fonttitle=\bfseries\small,
+  title=Revision from Report~1,
+  breakable,
+  left=4pt, right=4pt, top=4pt, bottom=4pt
+}
+
+% ── Document ──────────────────────────────────────────────────────────────────
+\begin{document}
+
+% ─────────────────────────── TITLE BLOCK ─────────────────────────────────────
+\begin{center}
+{\LARGE\bfseries Testing Memory Under Cognitive Load Using the\\[4pt]
+Mnemonic Similarity Task (MST)\par}
+\vspace{0.3cm}
+{\large\bfseries Report 2: Full Inferential Analysis (H1--H9)\par}
+\vspace{0.25cm}
+{\normalsize\href{https://github.com/team-baby-bayes/mst-study}{Github Repository [CLICK HERE]}\par}
+\vspace{0.25cm}
+{\normalsize\textbf{Team Baby Bayes}\par}
+\vspace{0.15cm}
+{\normalsize
+Achyutananda Sahoo (2025202028),\quad
+Satyajit Priyadarshi (2025201055),\quad
+Ameya Purohit (2025202006)\par}
+\end{center}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{abstract}
+\noindent
+This report presents the complete inferential analysis (H1--H9) for an MST study on how cognitive load at event boundaries affects recognition memory (REC) and lure discrimination (LDI). Report~2 revisits H1--H4 with corrected hypotheses and upgraded tests, and introduces five new analyses. All groups exceed chance on REC and LDI (H1--H2 supported). Boundary position does not affect LDI (H3 not supported) but does affect REC with a condition interaction (H7 partially supported). A lure-similarity gradient confirms pattern separation (H4 supported). Condition modulates LDI but not REC (H6 partially supported). A large boundary slowdown in encoding RT is found ($\eta^2_p{=}0.335$, H8 supported), with no speed--accuracy trade-off (H9 not supported).
+\end{abstract}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+% ─────────────────────────── 1. INTRODUCTION ─────────────────────────────────
+\section{Introduction}
+
+Event Segmentation Theory (EST) proposes that the brain briefly updates its internal ``event model'' at event boundaries, temporarily consuming cognitive resources and impairing encoding of immediately post-boundary items while strengthening memory for pre-boundary ones~\cite{zacks2007}. The hippocampus---particularly the dentate gyrus and CA3---supports pattern separation: storing similar experiences as distinct memory traces~\cite{bakker2008}. The Mnemonic Similarity Task (MST) probes this capacity, requiring participants to discriminate studied images from perceptually similar lures. This report covers H1--H9: H1--H4 are revisited from Report~1 with a structured format and upgraded analyses; H5--H9 are new.
+
+% ─────────────────────────── 2. METHODS ──────────────────────────────────────
+\section{Methods}
+
+\subsection*{2.1 Participants, Design, and Procedure}
+
+160 participants were split into three groups: \texttt{both\_item\_task} ($n{=}51$), \texttt{item\_only} ($n{=}56$), and \texttt{task\_only} ($n{=}53$). Boundaries were defined by: \textbf{item-only}---image-type switch (objects vs.\ scenes); \textbf{task-only}---question switch (e.g., ``Indoors?'' vs.\ ``Shoebox?''); \textbf{both}---simultaneous switches (highest load). Within 7-item blocks: Position~1 = Post-boundary, Positions~2--6 = Mid, Position~7 = Pre-boundary.
+
+At test, participants classified 150 probes (60 Targets, 60 Lures in 5 similarity bins where Bin~1 = most similar, 30 Foils) as \emph{Old}, \emph{Similar}, or \emph{New}.
+
+\subsection*{2.2 Data Preprocessing}
+
+Raw data were cleaned by matching encoding/test CSVs on participant IDs, removing invalid rows, assigning boundary positions via \texttt{trial\_index~\%~7} ($0{\to}$Post, $6{\to}$Pre, else Mid), mapping lure filenames to inherit their target's boundary label, and concatenating all participants into \texttt{compiled\_preprocessed.csv}.
+
+\subsection*{2.3 Memory Scores and Statistical Tests}
+
+\[
+  \mathrm{REC} = P(\mathrm{Old}\mid\mathrm{Target}) - P(\mathrm{Old}\mid\mathrm{Foil}), \qquad
+  \mathrm{LDI} = P(\mathrm{Similar}\mid\mathrm{Lure}) - P(\mathrm{Similar}\mid\mathrm{Foil}).
+\]
+Scores above zero indicate above-chance performance. All tests used Python (\texttt{scipy.stats}, \texttt{statsmodels}, \texttt{pingouin}), $\alpha = 0.05$; Holm's correction used throughout.
+
+% ─────────────────────────── 3. REPORT 1 SUMMARY ─────────────────────────────
+\section{Summary of Report 1 (H1--H4)}
+
+Report~1 conducted a preliminary inferential analysis covering H1--H4. Table~\ref{tab:r1summary} summarises the original tests and verdicts. Report~2 revisits all four with corrected hypotheses and upgraded tests; H3 receives an additional direction correction.
+
+\begin{table}[H]
+\centering
+\caption{Report~1 summary: original hypotheses, tests, key results, and verdicts.}
+\label{tab:r1summary}
+\small
+\begin{tabularx}{\textwidth}{clXXl}
+\toprule
+\textbf{H} & \textbf{Prediction} & \textbf{Test (Report~1)} & \textbf{Key Result} & \textbf{Verdict} \\
+\midrule
+H1 & REC $>$ 0 in all groups & One-sample one-tailed $t$-test & All $t > 24$,\ $p < 10^{-30}$ & Supported \\[2pt]
+H2 & LDI $>$ 0 in all groups & One-sample one-tailed $t$-test & All $t > 11$,\ $p < 10^{-14}$ & Supported \\[2pt]
+H3\textsuperscript{\dag} & LDI: Post $>$ Mid $>$ Pre & Three one-tailed paired $t$-tests & All $|\Delta| < 0.011$,\ $p > 0.20$ & Not Supported \\[2pt]
+H4 & LDI increases Bin~1$\to$5 & Consecutive paired $t$-tests (Bonferroni~$+$~FDR) & 2/4 steps significant & Partially Supported\textsuperscript{\ddag} \\
+\bottomrule
+\multicolumn{5}{l}{\textsuperscript{\dag}Direction revised in Report~2: Pre $>$ Mid $>$ Post per EST.} \\
+\multicolumn{5}{l}{\textsuperscript{\ddag}Upgraded to RM-ANOVA in Report~2; verdict revised to Supported.}
+\end{tabularx}
+\end{table}
+
+\noindent\textbf{Changes in Report~2:} H3 direction corrected (Post~$>$~Mid~$>$~Pre $\to$ Pre~$>$~Mid~$>$~Post) and upgraded to Mixed ANOVA with Tukey HSD post-hoc; H4 upgraded from consecutive paired $t$-tests to one-way RM-ANOVA per condition (verdict upgraded from Partially Supported to Supported).
+
+% ─────────────────────────── 4. RESULTS ──────────────────────────────────────
+\section{Results}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H1: Recognition Memory Above Chance}
+
+\paragraph{Motivation.}
+Before examining boundary or condition effects, we verify that each group's mean REC score reliably exceeds zero.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \mu_{\mathrm{REC}} = 0 \quad \text{(performance at chance)} \\
+  H_1 &:\quad \mu_{\mathrm{REC}} > 0 \quad \text{(performance above chance)}
+\end{align*}
+Tested separately per group.
+
+\paragraph{Test and Justification.}
+One-sample one-tailed $t$-test per group against zero. Population SD unknown; $n \geq 51$ (CLT applies); directional prediction justifies one-tailed test.
+
+\paragraph{Results.}
+All three groups recognised targets well above chance (Table~\ref{tab:h1}). Mean REC: item-only $= 0.634$, both $= 0.597$, task-only $= 0.596$; all $p \leq 10^{-31}$.
+
+\begin{table}[H]
+\centering
+\caption{H1: One-sample one-tailed $t$-tests for REC $> 0$ by group.}
+\label{tab:h1}
+\begin{tabular}{lrrrl}
+\toprule
+\textbf{Group} & \textbf{n} & \textbf{Mean REC} & \textbf{t} & \textbf{p-value} \\
+\midrule
+both\_item\_task & 51 & 0.597 & 30.97 & $1.36\times10^{-34}$ \\
+item\_only       & 56 & 0.634 & 30.96 & $8.67\times10^{-37}$ \\
+task\_only       & 53 & 0.596 & 24.88 & $7.57\times10^{-31}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H1 supported.} All groups encode and recognise targets with high fidelity; astronomically small $p$-values rule out guessing. The slight item-only advantage is consistent with dual-task load diverting encoding resources, tested formally in H6.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H2: Pattern Separation Above Chance}
+
+\paragraph{Motivation.}
+Above-chance LDI confirms that hippocampal pattern-separation mechanisms function under all three load conditions, establishing the validity of the core MST measure.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \mu_{\mathrm{LDI}} = 0 \quad \text{(lure discrimination at chance)} \\
+  H_1 &:\quad \mu_{\mathrm{LDI}} > 0 \quad \text{(lure discrimination above chance)}
+\end{align*}
+Tested separately per group.
+
+\paragraph{Test and Justification.}
+One-sample one-tailed $t$-test per group (same rationale as H1: unknown SD, $n \geq 51$, directional prediction).
+
+\paragraph{Results.}
+All groups discriminated lures above chance (Table~\ref{tab:h2}). Mean LDI: task-only $= 0.381$, item-only $= 0.319$, both $= 0.270$.
+
+\begin{table}[H]
+\centering
+\caption{H2: One-sample one-tailed $t$-tests for LDI $> 0$ by group.}
+\label{tab:h2}
+\begin{tabular}{lrrrl}
+\toprule
+\textbf{Group} & \textbf{n} & \textbf{Mean LDI} & \textbf{t} & \textbf{p-value} \\
+\midrule
+both\_item\_task & 51 & 0.270 & 11.04 & $2.55\times10^{-15}$ \\
+item\_only       & 56 & 0.319 & 14.09 & $3.38\times10^{-20}$ \\
+task\_only       & 53 & 0.381 & 14.74 & $1.67\times10^{-20}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H2 supported.} The dual-task group's markedly lower LDI ($\bar{x}{=}0.270$ vs.\ $0.381$ for task-only) suggests that simultaneous boundary changes reduce hippocampal encoding precision; the between-group difference is tested formally in H6.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H3: Does Boundary Position Affect LDI?}
+
+\begin{revisionbox}
+\small
+\textbf{Original (Report~1):} Post~$>$~Mid~$>$~Pre on LDI, tested with three one-tailed paired $t$-tests, assuming boundaries \emph{boost} post-boundary LDI. \textbf{Correction (Report~2):} EST predicts that context-updating at a boundary \emph{impairs} post-boundary encoding; the correct directional prediction is Pre~$>$~Mid~$>$~Post. Test upgraded to a 3$\times$3 Mixed ANOVA (position $\times$ condition) with Tukey HSD post-hoc.
+\end{revisionbox}
+
+\paragraph{Motivation.}
+EST predicts a boundary-position gradient in mnemonic precision: pre-boundary items are encoded in a stable event context and should yield higher LDI; post-boundary items are encoded during context updating and should yield lower LDI.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \mu_{\mathrm{LDI,Pre}} = \mu_{\mathrm{LDI,Mid}} = \mu_{\mathrm{LDI,Post}}
+        \quad \text{(no boundary-position effect on LDI)} \\
+  H_1 &:\quad \mu_{\mathrm{LDI,Pre}} > \mu_{\mathrm{LDI,Mid}} > \mu_{\mathrm{LDI,Post}}
+        \quad \text{(pre-boundary advantage; corrected from Report~1)}
+\end{align*}
+
+\paragraph{Test and Justification.}
+A 3$\times$3 Mixed ANOVA (within: boundary position; between: condition; $n{=}160$) jointly estimates main effects and their interaction. Assumption checks: normality (Shapiro--Wilk $p{>}0.05$ in all cells); sphericity tenable (Mauchly $W{>}0.96$, $p{>}0.34$); homogeneity of variance confirmed (Levene $p{>}0.16$). Tukey HSD post-hoc tests followed up the significant condition main effect.
+
+\paragraph{Results.}
+The Mixed ANOVA found no significant main effect of boundary position ($F(2,314){=}0.28$, $p{=}0.753$, $\eta^2_p{=}0.002$) and no interaction ($F(4,314){=}1.45$, $p{=}0.218$; Table~\ref{tab:h3mixed}). The condition main effect was significant ($F(2,157){=}5.50$, $p{=}0.005$, $\eta^2_p{=}0.065$); Tukey HSD identified only \texttt{both\_item\_task} vs.\ \texttt{task\_only} as significantly different ($\Delta{=}{-}0.110$, $p{=}0.003$, $g{=}{-}0.635$; Table~\ref{tab:h3posthoc}).
+
+\begin{table}[H]
+\centering
+\caption{H3: Mixed ANOVA for LDI (boundary position $\times$ condition).}
+\label{tab:h3mixed}
+\begin{tabular}{lrrrrl}
+\toprule
+\textbf{Source} & \textbf{DF1} & \textbf{DF2} & \textbf{F} & \textbf{p} & $\eta^2_p$ \\
+\midrule
+Condition               & 2 & 157 & 5.498 & \textbf{0.005} & 0.065 \\
+Boundary Position       & 2 & 314 & 0.284 & 0.753         & 0.002 \\
+Position $\times$ Cond. & 4 & 314 & 1.449 & 0.218         & 0.018 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{H3: Tukey HSD post-hoc for the condition main effect on LDI.}
+\label{tab:h3posthoc}
+\begin{tabular}{lrrrl}
+\toprule
+\textbf{Comparison} & \textbf{Mean Diff} & \textbf{p (Tukey)} & \textbf{Hedges' g} & \textbf{Sig.} \\
+\midrule
+both\_item\_task vs.\ item\_only & $-0.049$ & 0.337 & $-0.283$ & No \\
+both\_item\_task vs.\ task\_only & $-0.110$ & \textbf{0.003} & $-0.635$ & \textbf{Yes} \\
+item\_only vs.\ task\_only       & $-0.061$ & 0.197 & $-0.359$ & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H3_paired_0.png}
+  \caption{LDI distributions by boundary position.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H3_paired_2.png}
+  \caption{$p$-values for directional comparisons; none reaches $\alpha{=}0.05$.}
+\end{subfigure}
+\caption{H3: Boundary position does not reliably shift LDI across any analysis.}
+\label{fig:h3}
+\end{figure}
+
+\paragraph{Conclusion.}
+\textbf{H3 not supported.} The Mixed ANOVA finds no position effect on LDI; grand means (Pre~$=0.323$, Mid~$=0.330$, Post~$=0.319$) are effectively flat. Pattern separation appears driven by overall encoding quality (captured by condition) rather than fine-grained item position. High individual variability ($SD{\approx}0.17$--$0.19$) and block-modulo boundary assignment likely attenuate any true positional signal.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H4: Do More Similar Lures Lead to Lower LDI?}
+
+\paragraph{Motivation.}
+Lures span 5 similarity bins (Bin~1 = most similar to Bin~5 = least). If hippocampal pattern separation operates as theorised~\cite{bakker2008}, rejection difficulty should decrease monotonically with bin number, validating the stimulus design.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \mu_{\mathrm{LDI,Bin1}} = \mu_{\mathrm{LDI,Bin2}} = \cdots = \mu_{\mathrm{LDI,Bin5}}
+        \quad \text{(no similarity gradient)} \\
+  H_1 &:\quad \mu_{\mathrm{LDI,Bin1}} < \mu_{\mathrm{LDI,Bin2}} < \cdots < \mu_{\mathrm{LDI,Bin5}}
+        \quad \text{(monotonic similarity gradient)}
+\end{align*}
+
+\paragraph{Test and Justification.}
+One-way RM-ANOVA per condition (within-subjects factor: bin, 5 levels) with Bonferroni-corrected pairwise post-hoc tests. RM-ANOVA is appropriate because each participant provides LDI at all five bins, accounting for individual-level variation. Sphericity held for all conditions (Table~\ref{tab:h4spher}); no Greenhouse--Geisser correction required.
+
+\paragraph{Results.}
+
+\begin{table}[H]
+\centering
+\caption{H4: Mauchly's sphericity test (LDI $\sim$ bin, per condition).}
+\label{tab:h4spher}
+\small
+\begin{tabular}{lrrrl}
+\toprule
+\textbf{Condition} & \textbf{Mauchly's W} & $\chi^2$ & \textbf{p} & \textbf{Sphericity?} \\
+\midrule
+both\_item\_task & 0.784 & 11.77 & 0.227 & Yes \\
+item\_only       & 0.886 &  6.46 & 0.693 & Yes \\
+task\_only       & 0.772 & 13.06 & 0.160 & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All three conditions showed a highly significant effect of bin on LDI (Table~\ref{tab:h4anova}; Figure~\ref{fig:h4}), with medium effect sizes ($\eta^2_g = 0.062$--$0.109$).
+
+\begin{table}[H]
+\centering
+\caption{H4: One-way RM-ANOVA results per condition (LDI $\sim$ lure similarity bin).}
+\label{tab:h4anova}
+\begin{tabular}{lrrrrl}
+\toprule
+\textbf{Condition} & \textbf{F} & \textbf{df\textsubscript{num}} & \textbf{df\textsubscript{den}} & \textbf{p} & $\eta^2_g$ \\
+\midrule
+both\_item\_task & 10.098 & 4 & 200 & $< 0.001$ & 0.062 \\
+item\_only       & 17.349 & 4 & 220 & $< 0.001$ & 0.096 \\
+task\_only       & 20.639 & 4 & 208 & $< 0.001$ & 0.109 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{H4P2_0.png}
+\caption{H4: Mean LDI per bin by condition ($\pm$ SEM). Bin~1 is consistently lowest; task-only shows the richest gradient.}
+\label{fig:h4}
+\end{figure}
+
+Post-hoc Bonferroni tests ($p_{\mathrm{bonf}} < 0.05$; Table~\ref{tab:h4posthoc}) show Bin~1 as the dominant outlier across all conditions.
+
+Mean LDI per condition $\times$ bin: \texttt{both}: 0.175, 0.278, 0.249, 0.319, 0.320; \texttt{item}: 0.193, 0.342, 0.335, 0.369, 0.382; \texttt{task}: 0.249, 0.344, 0.396, 0.445, 0.471.
+
+\begin{table}[H]
+\centering
+\caption{H4: Significant Bonferroni post-hoc bin comparisons per condition ($p_{\mathrm{bonf}} < 0.05$).}
+\label{tab:h4posthoc}
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Condition} & \textbf{Significant pairs} & \textbf{Pattern} \\
+\midrule
+both\_item\_task
+  & Bin1$<$Bin2 ($p{=}0.021$),\ Bin1$<$Bin4 ($p{<}0.001$),
+  & Bin~1 outlier; \\
+  & Bin1$<$Bin5 ($p{<}0.001$),\ Bin3$<$Bin5 ($p{=}0.015$)
+  & Bins~2--5 plateau \\[4pt]
+item\_only
+  & Bin1$<$Bin2, Bin1$<$Bin3, Bin1$<$Bin4, Bin1$<$Bin5
+  & Sharp step from \\
+  & (all $p{<}0.001$)
+  & Bin~1; flat after \\[4pt]
+task\_only
+  & Bin1$<$Bin2 ($p{=}0.006$),\ Bin1$<$Bin3,4,5 ($p{<}0.001$),
+  & Near-monotonic \\
+  & Bin2$<$Bin4 ($p{=}0.012$),\ Bin2$<$Bin5 ($p{=}0.004$),
+  & gradient across \\
+  & Bin3$<$Bin5 ($p{=}0.035$)
+  & all 5 bins \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H4 supported.} LDI increases significantly from Bin~1 toward higher bins in all conditions, confirming that perceptual similarity drives pattern-separation difficulty. The gradient is not uniformly monotonic: Bin~1 is a clear outlier in \texttt{both\_item\_task} and \texttt{item\_only} with Bins~2--5 largely plateauing; only \texttt{task\_only} approaches true monotonicity. Once lures are moderately distinct, pattern separation approaches ceiling, with the ceiling reached sooner under higher cognitive load.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H5: Does Test-Phase Response Time Vary with Boundary Position?}
+
+\paragraph{Motivation.}
+If boundary processing produces weaker post-boundary memory traces, participants may respond more slowly at test when probed with those items, providing a retrieval-stage signature of encoding disruption.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \mu_{\mathrm{RT_{test},Post}} \leq \mu_{\mathrm{RT_{test},Mid}}
+             \;\text{ and }\;
+             \mu_{\mathrm{RT_{test},Post}} \leq \mu_{\mathrm{RT_{test},Pre}} \\
+  H_1 &:\quad \mu_{\mathrm{RT_{test},Post}} > \mu_{\mathrm{RT_{test},Mid}}
+             \;\text{ and }\;
+             \mu_{\mathrm{RT_{test},Post}} > \mu_{\mathrm{RT_{test},Pre}}
+\end{align*}
+
+\paragraph{Test and Justification.}
+Two one-tailed paired $t$-tests (Post~$>$~Mid; Post~$>$~Pre) on mean test-phase RT per participant ($n{=}158$). Paired to control for individual RT differences; one-tailed given the directional prediction.
+
+\paragraph{Results.}
+Neither comparison reached significance (Table~\ref{tab:h5}). Post-boundary RT was marginally \emph{shorter} than Mid ($\Delta{=}{-}0.037$~s, $p{=}0.816$); grand means: Pre~$=2.37$~s, Mid~$=2.44$~s, Post~$=2.41$~s.
+
+\begin{table}[H]
+\centering
+\caption{H5: One-tailed paired $t$-tests for boundary RT differences (test phase).}
+\label{tab:h5}
+\begin{tabular}{lrrrl}
+\toprule
+\textbf{Comparison} & \textbf{Mean Diff (s)} & \textbf{t} & \textbf{p-value} & \textbf{Supported} \\
+\midrule
+Post $>$ Mid & $-0.037$ & $-0.903$ & 0.816 & No \\
+Post $>$ Pre & $+0.034$ & $+0.933$ & 0.176 & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H5 not supported.} Test-phase RT is not shaped by boundary position, suggesting any encoding-time cost is transient and does not persist as a lasting feature of the memory trace accessible at retrieval.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H6: Do Conditions Differ in Overall REC and LDI?}
+
+\paragraph{Motivation.}
+If cognitive load selectively impairs hippocampal encoding precision, LDI should differ across conditions while coarser recognition (REC) remains stable---a dissociation informative about the neural mechanisms involved.
+
+\paragraph{Hypotheses.}
+For each metric $M \in \{\mathrm{REC},\, \mathrm{LDI}\}$:
+\begin{align*}
+  H_0 &:\quad \mu_{M,\mathrm{both}} = \mu_{M,\mathrm{item}} = \mu_{M,\mathrm{task}}
+        \quad \text{(no condition effect on }M\text{)} \\
+  H_1 &:\quad \text{at least one pair of conditions differs significantly on } M
+\end{align*}
+
+\paragraph{Test and Justification.}
+Three pairwise Welch $t$-tests per metric (Holm-corrected within each metric). Welch's test is preferred over one-way ANOVA as it does not assume equal variances across conditions.
+
+\paragraph{Results.}
+REC: no pairwise comparison survived Holm correction (all $p_{\mathrm{Holm}}{>}0.26$). LDI: \texttt{both\_item\_task} vs.\ \texttt{task\_only} significant ($\Delta{=}{-}0.110$, $t{=}{-}3.045$, $p_{\mathrm{Holm}}{=}0.009$; Figure~\ref{fig:h6}; Table~\ref{tab:h6}).
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H6_0.png}
+  \caption{REC and LDI distributions across conditions.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H6_1.png}
+  \caption{Holm-adjusted $p$-values for pairwise comparisons.}
+\end{subfigure}
+\caption{H6: Condition significantly affects LDI (dual-task $<$ task-only) but not REC.}
+\label{fig:h6}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{H6: Pairwise Welch $t$-tests for condition differences (Holm-corrected).}
+\label{tab:h6}
+\small
+\begin{tabular}{llrrrrl}
+\toprule
+\textbf{Metric} & \textbf{Comparison} & \textbf{Mean Diff} & \textbf{t} & $p_\text{raw}$ & $p_\text{Holm}$ & \textbf{Sig.} \\
+\midrule
+\multirow{3}{*}{REC}
+ & both vs.\ task  & $+0.006$ & $+0.197$ & 0.844 & 0.844 & No \\
+ & both vs.\ item  & $-0.032$ & $-1.121$ & 0.265 & 0.691 & No \\
+ & task vs.\ item  & $-0.038$ & $-1.207$ & 0.230 & 0.691 & No \\
+\midrule
+\multirow{3}{*}{LDI}
+ & both vs.\ task  & $-0.110$ & $-3.045$ & 0.003 & \textbf{0.009} & \textbf{Yes} \\
+ & both vs.\ item  & $-0.049$ & $-1.432$ & 0.155 & 0.155 & No \\
+ & task vs.\ item  & $+0.061$ & $+1.789$ & 0.076 & 0.153 & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H6 partially supported} (LDI affected; REC not). Task-only showed reliably higher mnemonic discrimination than dual-task ($p_{\mathrm{Holm}}{=}0.009$), confirming that simultaneous item-type and task-switch demands selectively degrade the fine-grained hippocampal encoding needed for pattern separation while leaving coarser recognition intact.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H7: Does Boundary Position Affect REC, and Does Condition Moderate This?}
+
+\paragraph{Motivation.}
+H3 found no boundary-position effect on LDI. Recognition (REC) operates via different mechanisms and may reveal a boundary effect, potentially amplified by condition load.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0^{\mathrm{pos}} &:\quad \text{boundary position has no main effect on REC} \\
+  H_0^{\mathrm{int}} &:\quad \text{the REC pattern across positions is identical across conditions} \\
+  H_1 &:\quad \text{position significantly affects REC and/or is modulated by condition}
+\end{align*}
+
+\paragraph{Test and Justification.}
+Mixed-Model ANOVA on per-participant REC by boundary position (within: position; between: condition; $n{=}160$). Sphericity tenable (Mauchly $W{=}0.973$, $\chi^2(2){=}4.37$, $p{=}0.113$); Levene $p{>}0.57$ for all cells.
+
+\paragraph{Results.}
+Position main effect significant ($F(2,314){=}4.64$, $p{=}0.010$, $\eta^2_p{=}0.029$); condition not significant ($F(2,157){=}0.976$, $p{=}0.379$); interaction significant ($F(4,314){=}2.99$, $p{=}0.019$, $\eta^2_p{=}0.037$; Table~\ref{tab:h7}; Figure~\ref{fig:h7}). Post-hoc Bonferroni: Mid~$>$~Post overall ($t(159){=}2.641$, $p_{\mathrm{bonf}}{=}0.027$); within \texttt{both\_item\_task}: Mid~$>$~Post ($p_{\mathrm{bonf}}{=}0.003$) and Post~$<$~Pre ($p_{\mathrm{bonf}}{=}0.022$).
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H7_1.png}
+  \caption{Mean REC by position $\times$ condition (SEM bars).}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H7_3.png}
+  \caption{Position effect within each condition.}
+\end{subfigure}
+\caption{H7: Post-boundary REC drop is largest under dual-task load.}
+\label{fig:h7}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{H7: Mixed-Model ANOVA for REC (position $\times$ condition).}
+\label{tab:h7}
+\begin{tabular}{lrrrrl}
+\toprule
+\textbf{Source} & \textbf{DF1} & \textbf{DF2} & \textbf{F} & \textbf{p} & $\eta^2_p$ \\
+\midrule
+Condition               & 2 & 157 & 0.976 & 0.379         & 0.012 \\
+Boundary Position       & 2 & 314 & 4.635 & \textbf{0.010} & 0.029 \\
+Position $\times$ Cond. & 4 & 314 & 2.989 & \textbf{0.019} & 0.037 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H7 partially supported.} REC is reliably lower at post-boundary than mid-boundary positions, and the drop is amplified under maximal load (\texttt{both\_item\_task}), consistent with EST. The absence of an analogous LDI effect (H3) suggests recognition and pattern separation respond differently to boundary-related encoding disruption.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H8: Does Encoding RT Show a Boundary Slowdown?}
+
+\paragraph{Motivation.}
+If boundaries trigger a mandatory context-update process~\cite{zacks2007}, post-boundary items should elicit longer encoding RT, providing direct behavioural evidence for the EST mechanism independent of memory outcomes.
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \mu_{\mathrm{RT_{enc},Post}} = \mu_{\mathrm{RT_{enc},Pre}}
+        \quad \text{(no boundary slowdown)} \\
+  H_1 &:\quad \mu_{\mathrm{RT_{enc},Post}} > \mu_{\mathrm{RT_{enc},Pre}}
+        \quad \text{(post-boundary encoding is slower)}
+\end{align*}
+
+\paragraph{Test and Justification.}
+Mixed-Model ANOVA on per-participant mean encoding RT (within: Pre vs.\ Post; between: condition; $n{=}160$), simultaneously estimating main boundary effect and condition-dependent modulation.
+
+\paragraph{Results.}
+All three ANOVA effects were highly significant (Figure~\ref{fig:h8}; Table~\ref{tab:h8}): boundary position $F(1,157){=}78.94$, $p{<}0.0001$, $\eta^2_p{=}0.335$ (large); condition $F(2,157){=}11.65$, $p{<}0.0001$, $\eta^2_p{=}0.129$; interaction $F(2,157){=}38.22$, $p{<}0.0001$, $\eta^2_p{=}0.327$.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H8_0.png}
+  \caption{Encoding RT by position and condition ($\pm$ SE).}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{H8_1.png}
+  \caption{Encoding RT grouped by condition and position.}
+\end{subfigure}
+\caption{H8: Large boundary slowdown ($\eta^2_p{=}0.335$) with a significant condition interaction.}
+\label{fig:h8}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{H8: Mixed-Model ANOVA for encoding RT (Pre vs.\ Post).}
+\label{tab:h8}
+\begin{tabular}{lrrrrl}
+\toprule
+\textbf{Source} & \textbf{DF1} & \textbf{DF2} & \textbf{F} & \textbf{p} & $\eta^2_p$ \\
+\midrule
+Condition         & 2 & 157 & 11.651 & $< 0.0001$ & 0.129 \\
+Boundary Position & 1 & 157 & 78.941 & $< 0.0001$ & \textbf{0.335} \\
+Interaction       & 2 & 157 & 38.224 & $< 0.0001$ & 0.327 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H8 fully supported.} The boundary slowdown ($\eta^2_p{=}0.335$) is the strongest effect in the dataset, directly validating EST. The large interaction ($\eta^2_p{=}0.327$) indicates that dual-task boundaries trigger the most resource-intensive context update. The absence of an RT--memory link (H9) suggests this slowdown is a mandatory, memory-neutral context-update obligation rather than an elaborative encoding strategy.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection*{H9: Speed--Accuracy Trade-off (Encoding RT vs.\ REC \& LDI)}
+
+\paragraph{Motivation.}
+The large encoding RT slowdown at boundaries (H8) raises a natural question: does slower encoding predict better or worse memory?
+
+\paragraph{Hypotheses.}
+\begin{align*}
+  H_0 &:\quad \rho(\mathrm{RT}_{\mathrm{enc}},\, M) = 0 \quad \text{for } M \in \{\mathrm{REC},\, \mathrm{LDI}\},\; \text{per condition} \\
+  H_1 &:\quad \rho(\mathrm{RT}_{\mathrm{enc}},\, M) \neq 0 \quad \text{(a significant speed--accuracy relationship exists)}
+\end{align*}
+
+\paragraph{Test and Justification.}
+Pearson $r$ between mean encoding RT and memory scores per condition (six two-tailed tests). Spearman $\rho$ computed for \texttt{task\_only} as a robustness check.
+
+\paragraph{Results.}
+No correlation was significant in any condition (Figure~\ref{fig:h9}; Table~\ref{tab:h9}). In \texttt{both\_item\_task} the RT--REC correlation was weakly negative ($r{=}{-}0.255$, $p{=}0.071$). Spearman checks for \texttt{task\_only}: $\rho{=}0.125$ ($p{=}0.372$, REC) and $\rho{=}0.171$ ($p{=}0.222$, LDI).
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.44\textwidth}
+  \includegraphics[width=\textwidth]{H9_2.png}
+  \caption{Heatmap of Pearson $r$ (encoding RT $\times$ REC/LDI).}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.52\textwidth}
+  \includegraphics[width=\textwidth]{H9_5.png}
+  \caption{Correlation coefficients with 95\% CI.}
+\end{subfigure}
+\caption{H9: No speed--accuracy trade-off; encoding RT does not predict memory quality.}
+\label{fig:h9}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{H9: Pearson correlations between encoding RT and memory scores by condition.}
+\label{tab:h9}
+\begin{tabular}{lllrrl}
+\toprule
+\textbf{Condition} & \textbf{n} & \textbf{Metric} & \textbf{r} & \textbf{p-value} & \textbf{Significant} \\
+\midrule
+\multirow{2}{*}{both\_item\_task} & \multirow{2}{*}{51}
+  & RT vs.\ REC & $-0.255$ & 0.071 & No \\
+  &  & RT vs.\ LDI & $-0.196$ & 0.168 & No \\
+\midrule
+\multirow{2}{*}{item\_only} & \multirow{2}{*}{56}
+  & RT vs.\ REC & $+0.033$ & 0.807 & No \\
+  &  & RT vs.\ LDI & $-0.178$ & 0.190 & No \\
+\midrule
+\multirow{2}{*}{task\_only} & \multirow{2}{*}{53}
+  & RT vs.\ REC & $+0.072$ & 0.608 & No \\
+  &  & RT vs.\ LDI & $+0.204$ & 0.142 & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.}
+\textbf{H9 not supported.} Encoding speed does not predict memory quality within any condition. Individual RT differences likely reflect domain-general processing speed rather than encoding-strategy variation, consistent with the boundary slowdown (H8) being a mandatory context-update obligation that consumes time but does not alter memory trace quality.
+
+% ─────────────────────────── 5. SUMMARY TABLE ─────────────────────────────────
+\section{Summary of All Hypotheses}
+
+\begin{table}[H]
+\centering
+\caption{Complete summary of all nine hypotheses: predictions, tests, key statistics, and verdicts.}
+\label{tab:summary}
+\small
+\begin{tabularx}{\textwidth}{clXXl}
+\toprule
+\textbf{H} & \textbf{Prediction} & \textbf{Test (Report~2)} & \textbf{Key Statistics} & \textbf{Verdict} \\
+\midrule
+H1 & REC $>$ 0 across groups
+   & One-sample one-tailed $t$
+   & All $t > 24$, $p < 10^{-30}$
+   & Supported \\[3pt]
+H2 & LDI $>$ 0 across groups
+   & One-sample one-tailed $t$
+   & All $t > 11$, $p < 10^{-14}$
+   & Supported \\[3pt]
+H3\textsuperscript{\dag} & LDI: Pre $>$ Mid $>$ Post
+   & Mixed ANOVA $+$ Tukey HSD
+   & Position: $F(2,314){=}0.28$, $p{=}0.753$
+   & Not Supported \\[3pt]
+H4 & Bin LDI increases Bin~1$\to$5
+   & RM-ANOVA per condition $+$ Bonferroni
+   & All $F > 10$, $p < 0.001$; $\eta^2_g{=}0.06$--$0.11$
+   & Supported \\[3pt]
+H5 & Test RT: Post $>$ Pre/Mid
+   & One-tailed paired $t$
+   & $\Delta{=}{-}0.037$~s \& $+0.034$~s, $p{>}0.17$
+   & Not Supported \\[3pt]
+H6 & Condition differences in REC \& LDI
+   & Welch $t$ (Holm)
+   & LDI: dual-task $<$ task-only ($p_\text{Holm}{=}0.009$); REC: n.s.
+   & Partially Supported \\[3pt]
+H7 & Position $\times$ condition on REC
+   & Mixed ANOVA
+   & $F_{\text{pos}}{=}4.64$, $p{=}0.010$; $F_{\text{int}}{=}2.99$, $p{=}0.019$
+   & Partially Supported \\[3pt]
+H8 & Encoding RT: Post $>$ Pre
+   & Mixed ANOVA
+   & $F(1,157){=}78.94$, $p{<}0.0001$, $\eta^2_p{=}0.335$
+   & Supported \\[3pt]
+H9 & Encoding RT correlates with memory
+   & Pearson $r$ per condition
+   & All $|r| < 0.26$, all $p > 0.07$
+   & Not Supported \\
+\bottomrule
+\multicolumn{5}{l}{\textsuperscript{\dag}Direction revised from Post $>$ Mid $>$ Pre (Report~1) to Pre $>$ Mid $>$ Post (Report~2).}
+\end{tabularx}
+\end{table}
+
+% ─────────────────────────── 6. CONCLUSION ───────────────────────────────────
+\section{Conclusion and Future Directions}
+
+\paragraph{Memory is robust but selectively load-sensitive (H1, H2, H6).}
+All groups performed well above chance on both REC and LDI. The dual-task condition scored significantly lower on LDI than task-only ($p_{\mathrm{Holm}}{=}0.009$, H6), confirming that simultaneous boundary changes selectively impair hippocampal pattern separation without affecting coarser recognition. This dissociation suggests pattern separation has a lower capacity ceiling under dual cognitive load.
+
+\paragraph{Boundary position matters for REC but not LDI (H3, H7).}
+H3 found no position effect on LDI across any analysis. H7's Mixed ANOVA on REC revealed a significant position main effect ($p{=}0.010$) and condition interaction ($p{=}0.019$): mid-boundary REC exceeded post-boundary REC, driven primarily by \texttt{both\_item\_task}. This asymmetry suggests recognition and pattern separation respond differently to boundary encoding disruption.
+
+\paragraph{Encoding RT robustly captures the boundary cost (H8, H5, H9).}
+The strongest signal in the dataset is the boundary slowdown in encoding RT ($\eta^2_p{=}0.335$, $F{=}78.94$, $p{<}0.0001$), directly validating EST. The large interaction ($\eta^2_p{=}0.327$) confirms dual-task boundaries are most resource-intensive. Absent test-phase RT effects (H5) and absent RT--memory correlations (H9) together indicate the slowdown is a mandatory, memory-neutral context-update process.
+
+\paragraph{Similarity gradient is real but non-uniform (H4).}
+RM-ANOVA confirmed a significant bin effect in all conditions ($p{<}0.001$). Bin~1 is a consistent outlier while Bins~2--5 plateau in \texttt{both\_item\_task} and \texttt{item\_only}; only \texttt{task\_only} shows a richer near-monotonic gradient. Future work could use pupillometry or EEG to verify the block-modulo boundary assignment, and mediation analyses could test whether the encoding RT slowdown (H8) partially mediates the REC boundary effect (H7).
+
+% ─────────────────────────── REFERENCES ──────────────────────────────────────
+\begin{thebibliography}{9}
+\bibitem{zacks2007}
+Zacks, J.\,M., Speer, N.\,K., Swallow, K.\,M., Braver, T.\,S., \& Reynolds, J.\,R. (2007).
+Event perception: A mind-brain perspective.
+\textit{Psychological Bulletin}, \textit{133}(2), 273--293.
+
+\bibitem{bakker2008}
+Bakker, A., Kirwan, C.\,B., Miller, M., \& Bhutani, N. (2008).
+Pattern separation in the human hippocampal CA3 and dentate gyrus.
+\textit{Science}, \textit{319}(5870), 1640--1642.
+
+\bibitem{swallow2009}
+Swallow, K.\,M., Zacks, J.\,M., \& Abrams, R.\,A. (2009).
+Event boundaries in perception affect memory encoding and updating.
+\textit{Journal of Experimental Psychology: General}, \textit{138}(2), 236--257.
+
+\bibitem{morse2023}
+Morse, S.\,J., Karagoz, A.\,B., \& Reagh, Z.\,M. (2023).
+Event boundaries directionally influence item-level recognition memory.
+\end{thebibliography}
+
+% ─────────────────────────── CONTRIBUTIONS ───────────────────────────────────
+\section*{Contributions}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Name} & \textbf{Roll No.} & \textbf{Contributions} \\
+\midrule
+Achyutananda Sahoo   & 2025202028 & EDA, H4 follow-up, H7 ANOVA, H8 analysis, H3 ANOVA revision \\
+Satyajit Priyadarshi & 2025201055 & Data preprocessing, H1--H3, H5, H6, H9 \\
+Ameya Purohit        & 2025202006 & Hypothesis testing, $p$-value correction, interpretation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
